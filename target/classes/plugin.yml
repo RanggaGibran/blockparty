@@ -5,7 +5,7 @@ api-version: 1.20
 description: Mining plugin that gives random rewards including crate keys and MMOItems
 author: rnggagib
 
-softdepend: [WorldGuard, MMOItems]
+softdepend: [PlaceholderAPI, WorldGuard, MMOItems]
 
 commands:
   blockparty:

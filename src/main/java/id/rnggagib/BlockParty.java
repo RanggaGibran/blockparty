@@ -13,6 +13,7 @@ import id.rnggagib.managers.RewardManager;
 import id.rnggagib.managers.PlayerDataManager;
 import id.rnggagib.managers.WorldGuardManager;
 import id.rnggagib.managers.BlockRegenerationManager;
+import id.rnggagib.placeholder.PlaceholderManager;
 
 import java.util.logging.Logger;
 import org.bukkit.plugin.PluginManager;
@@ -35,6 +36,7 @@ public class BlockParty extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private WorldGuardManager worldGuardManager;
     private BlockRegenerationManager blockRegenerationManager;
+    private PlaceholderManager placeholderManager;
     
     // Command handler
     private CommandManager commandManager;
@@ -63,6 +65,15 @@ public class BlockParty extends JavaPlugin {
         // Register commands
         commandManager = new CommandManager(this);
         getCommand("blockparty").setExecutor(commandManager);
+        
+        // Setup PlaceholderAPI integration if available
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            LOGGER.info("PlaceholderAPI found, registering placeholders");
+            placeholderManager = new PlaceholderManager(this);
+            placeholderManager.register();
+        } else {
+            LOGGER.info("PlaceholderAPI not found, placeholders won't be available");
+        }
         
         LOGGER.info("BlockParty has been enabled!");
     }
