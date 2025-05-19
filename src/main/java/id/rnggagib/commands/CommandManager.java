@@ -5,6 +5,7 @@ import id.rnggagib.commands.subcommands.GiveCommand;
 import id.rnggagib.commands.subcommands.HelpCommand;
 import id.rnggagib.commands.subcommands.ReloadCommand;
 import id.rnggagib.commands.subcommands.StatsCommand;
+import id.rnggagib.commands.subcommands.RegionCommand;
 import id.rnggagib.commands.subcommands.SubCommand;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         registerSubCommand(new ReloadCommand(plugin));
         registerSubCommand(new GiveCommand(plugin));
         registerSubCommand(new StatsCommand(plugin));
+        registerSubCommand(new RegionCommand(plugin));
     }
     
     /**

@@ -4,6 +4,8 @@ import id.rnggagib.commands.CommandManager;
 import id.rnggagib.config.ConfigManager;
 import id.rnggagib.listeners.BlockBreakListener;
 import id.rnggagib.listeners.PlayerInteractListener;
+import id.rnggagib.listeners.PlayerJoinListener;
+import id.rnggagib.listeners.PlayerQuitListener;
 import id.rnggagib.managers.AccessManager;
 import id.rnggagib.managers.MessageManager;
 import id.rnggagib.managers.MiningSessionManager;
@@ -82,6 +84,8 @@ public class BlockParty extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new PlayerInteractListener(this), this);
         pm.registerEvents(new BlockBreakListener(this), this);
+        pm.registerEvents(new PlayerJoinListener(this), this);
+        pm.registerEvents(new PlayerQuitListener(this), this);
     }
     
     /**

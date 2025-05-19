@@ -48,3 +48,18 @@ messages:
       <gray>Keys Found:</gray> <gold>%keys_found%</gold>
     invalid-player: "<red>Player not found.</red>"
     invalid-number: "<red>Please enter a valid number.</red>"
+
+  # Region messages
+  region:
+    help: |-
+      <yellow>BlockParty Region Commands:</yellow>
+      <gold>/bp region add <name></gold> <gray>- Add a region to allowed mining areas</gray>
+      <gold>/bp region remove <name></gold> <gray>- Remove a region from allowed mining areas</gray>
+      <gold>/bp region list</gold> <gray>- List all allowed mining regions</gray>
+    specify-name: "<red>Please specify a region name.</red>"
+    added: "<green>Region <gold>{region}</gold> has been added to allowed mining areas.</green>"
+    already-exists: "<red>Region <gold>{region}</gold> is already an allowed mining area.</red>"
+    removed: "<green>Region <gold>{region}</gold> has been removed from allowed mining areas.</green>"
+    not-found: "<red>Region <gold>{region}</gold> was not found in allowed mining areas.</red>"
+    list-header: "<yellow>Allowed Mining Regions:</yellow>"
+    no-regions: "<yellow>No regions have been set up for mining. By default, mining is allowed everywhere.</yellow>"

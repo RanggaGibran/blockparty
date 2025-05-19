@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -153,5 +154,52 @@ public class WorldGuardManager {
      */
     public boolean isWorldGuardEnabled() {
         return worldGuardEnabled && useWorldGuard;
+    }
+    
+    /**
+     * Add a region to the allowed regions list
+     * @param regionName The region name to add
+     * @return True if the region was added, false if it already exists
+     */
+    public boolean addAllowedRegion(String regionName) {
+        if (allowedRegions.contains(regionName)) {
+            return false;
+        }
+        
+        allowedRegions.add(regionName);
+        saveRegions();
+        return true;
+    }
+
+    /**
+     * Remove a region from the allowed regions list
+     * @param regionName The region name to remove
+     * @return True if the region was removed, false if not found
+     */
+    public boolean removeAllowedRegion(String regionName) {
+        boolean removed = allowedRegions.remove(regionName);
+        
+        if (removed) {
+            saveRegions();
+        }
+        
+        return removed;
+    }
+
+    /**
+     * Get all allowed mining regions
+     * @return Set of allowed region names
+     */
+    public Set<String> getAllowedRegions() {
+        return new HashSet<>(allowedRegions);
+    }
+
+    /**
+     * Save regions to the configuration file
+     */
+    private void saveRegions() {
+        FileConfiguration config = plugin.getConfigManager().getConfig();
+        config.set("worldguard.allowed-regions", new ArrayList<>(allowedRegions));
+        plugin.getConfigManager().saveMainConfig();
     }
 }
