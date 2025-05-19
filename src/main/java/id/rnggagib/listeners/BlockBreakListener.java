@@ -11,17 +11,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 /**
  * Handles block breaking for BlockParty sessions
  */
 public class BlockBreakListener implements Listener {
     private final BlockParty plugin;
-    // Store blocks that should regenerate
-    private final Map<Block, BlockState> blocksToRegenerate;
     
     /**
      * Constructor
@@ -29,7 +23,6 @@ public class BlockBreakListener implements Listener {
      */
     public BlockBreakListener(BlockParty plugin) {
         this.plugin = plugin;
-        this.blocksToRegenerate = new HashMap<>();
     }
     
     /**
@@ -74,32 +67,10 @@ public class BlockBreakListener implements Listener {
             plugin.getRewardManager().giveRandomReward(player);
         }
         
-        // Schedule block regeneration
-        scheduleBlockRegeneration(block, blockState);
+        // Schedule block regeneration using the manager
+        plugin.getBlockRegenerationManager().scheduleRegeneration(block, blockState);
         
         // Inform player about block regeneration
         plugin.getMessageManager().sendMessage(player, "mining.block-regenerate");
-    }
-    
-    /**
-     * Schedule a block to regenerate after a delay
-     * @param block The block to regenerate
-     * @param originalState The original state of the block
-     */
-    private void scheduleBlockRegeneration(Block block, BlockState originalState) {
-        // Store original state
-        blocksToRegenerate.put(block, originalState);
-        
-        // Schedule regeneration (5-30 seconds, random)
-        int delay = 5 + (int)(Math.random() * 25);
-        
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            // Make sure the block hasn't been changed by something else
-            if (blocksToRegenerate.containsKey(block)) {
-                BlockState storedState = blocksToRegenerate.get(block);
-                block.setType(storedState.getType());
-                blocksToRegenerate.remove(block);
-            }
-        }, delay * 20L); // Convert to ticks (20 ticks = 1 second)
     }
 }

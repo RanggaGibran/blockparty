@@ -12,6 +12,7 @@ import id.rnggagib.managers.MiningSessionManager;
 import id.rnggagib.managers.RewardManager;
 import id.rnggagib.managers.PlayerDataManager;
 import id.rnggagib.managers.WorldGuardManager;
+import id.rnggagib.managers.BlockRegenerationManager;
 
 import java.util.logging.Logger;
 import org.bukkit.plugin.PluginManager;
@@ -33,6 +34,7 @@ public class BlockParty extends JavaPlugin {
     private RewardManager rewardManager;
     private PlayerDataManager playerDataManager;
     private WorldGuardManager worldGuardManager;
+    private BlockRegenerationManager blockRegenerationManager;
     
     // Command handler
     private CommandManager commandManager;
@@ -53,6 +55,7 @@ public class BlockParty extends JavaPlugin {
         accessManager = new AccessManager(this);
         sessionManager = new MiningSessionManager(this);
         rewardManager = new RewardManager(this);
+        blockRegenerationManager = new BlockRegenerationManager(this);
         
         // Register events
         registerListeners();
@@ -73,6 +76,9 @@ public class BlockParty extends JavaPlugin {
         
         // Cancel any active sessions
         sessionManager.cancelAllSessions();
+        
+        // Cancel block regeneration tasks
+        blockRegenerationManager.cancelAllTasks();
         
         LOGGER.info("BlockParty has been disabled!");
     }
@@ -126,6 +132,14 @@ public class BlockParty extends JavaPlugin {
     }
     
     /**
+     * Get the block regeneration manager
+     * @return BlockRegenerationManager instance
+     */
+    public BlockRegenerationManager getBlockRegenerationManager() {
+        return blockRegenerationManager;
+    }
+    
+    /**
      * Reload the plugin configuration
      */
     public void reload() {
@@ -138,5 +152,6 @@ public class BlockParty extends JavaPlugin {
         // Reinitialize managers that need reloading
         rewardManager.reload();
         accessManager.reload();
+        blockRegenerationManager.reload();
     }
 }
