@@ -1,4 +1,36 @@
-name: blockparty
+name: BlockParty
 main: id.rnggagib.BlockParty
 version: 1.0-SNAPSHOT
-api-version: 1.15
+api-version: 1.20
+description: Mining plugin that gives random rewards including crate keys and MMOItems
+author: rnggagib
+
+softdepend: [WorldGuard, MMOItems]
+
+commands:
+  blockparty:
+    description: Main command for BlockParty plugin
+    usage: |-
+      §cUsage:
+      §e/blockparty reload §7- Reload configuration
+      §e/blockparty give <player> [amount] §7- Give access items
+      §e/blockparty stats §7- View mining statistics
+    aliases: [bp]
+    permission: blockparty.command
+
+permissions:
+  blockparty.command:
+    description: Allows access to BlockParty commands
+    default: op
+  blockparty.reload:
+    description: Allows reloading the plugin configuration
+    default: op
+  blockparty.give:
+    description: Allows giving block party access items to players
+    default: op
+  blockparty.use:
+    description: Allows using the block party feature
+    default: true
+  blockparty.stats:
+    description: Allows viewing mining statistics
+    default: true

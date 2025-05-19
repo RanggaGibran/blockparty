@@ -1,0 +1,50 @@
+# BlockParty Messages Configuration
+# Version 1.0
+# Uses MiniMessage format: https://docs.advntr.dev/minimessage/format.html
+
+prefix: "<dark_gray>[<gradient:gold:yellow>BlockParty</gradient><dark_gray>]</dark_gray> "
+
+messages:
+  # General plugin messages
+  plugin:
+    reload: "<green>BlockParty configuration reloaded successfully!</green>"
+    no-permission: "<red>You don't have permission to use this command.</red>"
+    player-only: "<red>This command can only be used by players.</red>"
+  
+  # Access item messages
+  access:
+    granted: "<green>Block Party access granted! You have <gold>5 minutes</gold> to mine special blocks.</green>"
+    denied: "<red>You can't use Block Party here.</red>"
+    already-active: "<yellow>You already have an active Block Party session.</yellow>"
+    received: "<green>You received <gold>%amount%x</gold> Block Party access item(s)!</green>"
+    given: "<green>Gave <gold>%amount%x</gold> Block Party access to <yellow>%player%</yellow>.</green>"
+  
+  # Timer messages
+  timer:
+    started: "<green>Block Party started! <gold>5:00</gold> remaining.</green>"
+    action-bar: "<gold>Block Party: %time% remaining</gold>"
+    warning: "<yellow>Block Party ending in <gold>%time%</gold>!</yellow>"
+    ended: "<red>Your Block Party session has ended.</red>"
+  
+  # Mining messages
+  mining:
+    cannot-break: "<red>You can't mine this block during Block Party.</red>"
+    no-active-session: "<red>You need an active Block Party session to mine special blocks.</red>"
+    block-regenerate: "<gray>The block will regenerate soon...</gray>"
+  
+  # Command messages
+  command:
+    invalid: "<red>Invalid command. Use <gold>/bp help</gold> for help.</red>"
+    help: |-
+      <yellow>BlockParty Commands:</yellow>
+      <gold>/bp reload</gold> <gray>- Reload configuration</gray>
+      <gold>/bp give <player> [amount]</gold> <gray>- Give access items</gray>
+      <gold>/bp stats</gold> <gray>- View mining statistics</gray>
+    stats: |-
+      <yellow>Your BlockParty Statistics:</yellow>
+      <gray>Blocks Mined:</gray> <gold>%blocks_mined%</gold>
+      <gray>Rewards Found:</gray> <gold>%rewards_found%</gold>
+      <gray>MMOItems Found:</gray> <gold>%mmoitems_found%</gold>
+      <gray>Keys Found:</gray> <gold>%keys_found%</gold>
+    invalid-player: "<red>Player not found.</red>"
+    invalid-number: "<red>Please enter a valid number.</red>"

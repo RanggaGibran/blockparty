@@ -1,0 +1,41 @@
+# BlockParty Configuration
+# Version 1.0
+
+# General Settings
+settings:
+  # Mining session duration in seconds (300 seconds = 5 minutes)
+  mining-session-duration: 300
+  # Show timer in action bar (true/false)
+  show-timer: true
+  # Action bar update frequency in ticks (20 ticks = 1 second)
+  timer-update-frequency: 20
+
+# Access Item Settings
+access-item:
+  # Material type of the access item (must be valid Bukkit material)
+  material: DIAMOND_PICKAXE
+  # Custom model data for the access item (for resource packs)
+  custom-model-data: 1001
+  # Name of the access item
+  name: "<gradient:gold:yellow:gold>Block Party Access</gradient>"
+  # Lore of the access item
+  lore:
+    - "<gray>Right-click to activate Block Party"
+    - "<gray>Grants 5 minutes of mining time"
+    - "<dark_purple>Special mining rewards await!"
+
+# WorldGuard Integration
+worldguard:
+  # Enable WorldGuard region checks
+  enabled: true
+  # Only allow Block Party in specific regions (empty list = all regions)
+  allowed-regions: []
+  # Deny Block Party in specific regions
+  denied-regions: []
+
+# Plugin Metrics and Statistics
+statistics:
+  # Enable collecting and storing player statistics
+  enabled: true
+  # Save statistics to file on plugin disable
+  save-on-disable: true

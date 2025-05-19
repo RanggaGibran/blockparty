@@ -1,0 +1,91 @@
+# BlockParty Blocks and Rewards Configuration
+# Version 1.0
+
+# List of blocks that can be mined for rewards
+minable-blocks:
+  STONE:
+    enabled: true
+    # Chance for this block to give a reward when broken (0.0 - 1.0)
+    reward-chance: 0.3
+    # Whether to drop the vanilla block drop
+    drop-vanilla: false
+  COAL_ORE:
+    enabled: true
+    reward-chance: 0.5
+    drop-vanilla: false
+  IRON_ORE:
+    enabled: true
+    reward-chance: 0.6
+    drop-vanilla: false
+  GOLD_ORE:
+    enabled: true
+    reward-chance: 0.7
+    drop-vanilla: false
+  DIAMOND_ORE:
+    enabled: true
+    reward-chance: 0.8
+    drop-vanilla: false
+  EMERALD_ORE:
+    enabled: true
+    reward-chance: 0.9
+    drop-vanilla: false
+  ANCIENT_DEBRIS:
+    enabled: true
+    reward-chance: 1.0
+    drop-vanilla: false
+
+# Reward configuration
+rewards:
+  # MMOItems rewards
+  mmoitems:
+    enabled: true
+    # Overall chance to get an MMOItem reward
+    chance: 0.3
+    items:
+      - type: SWORD
+        id: EMERALD_SWORD
+        # Chance within MMOItem category (0.0 - 1.0)
+        chance: 0.1
+      - type: ARMOR
+        id: EMERALD_HELMET
+        chance: 0.1
+      - type: CONSUMABLE
+        id: HEALTH_POTION
+        chance: 0.3
+
+  # Crate key rewards
+  crate-keys:
+    enabled: true
+    chance: 0.2
+    keys:
+      - name: keramat
+        # Command to execute for giving key (use %player% placeholder)
+        command: "crate give %player% keramat 1"
+        chance: 0.1
+        message: "<gradient:gold:yellow>You found a Keramat Crate Key!</gradient>"
+      - name: emerald
+        command: "crate give %player% emerald 1"
+        chance: 0.3
+        message: "<gradient:green:lime>You found an Emerald Crate Key!</gradient>"
+
+  # Vanilla item rewards
+  vanilla-items:
+    enabled: true
+    chance: 0.5
+    items:
+      - material: IRON_INGOT
+        min-amount: 1
+        max-amount: 3
+        chance: 0.3
+      - material: GOLD_INGOT
+        min-amount: 1
+        max-amount: 2
+        chance: 0.2
+      - material: DIAMOND
+        min-amount: 1
+        max-amount: 1
+        chance: 0.1
+      - material: COAL
+        min-amount: 2
+        max-amount: 5
+        chance: 0.4
