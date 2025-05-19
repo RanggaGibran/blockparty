@@ -6,14 +6,18 @@ import id.rnggagib.listeners.BlockBreakListener;
 import id.rnggagib.listeners.PlayerInteractListener;
 import id.rnggagib.listeners.PlayerJoinListener;
 import id.rnggagib.listeners.PlayerQuitListener;
+import id.rnggagib.listeners.RegionWandListener;
+import id.rnggagib.listeners.ItemProtectionListener;
 import id.rnggagib.managers.AccessManager;
+import id.rnggagib.managers.BlockRegenerationManager;
+import id.rnggagib.managers.ComboManager;
 import id.rnggagib.managers.MessageManager;
 import id.rnggagib.managers.MiningSessionManager;
-import id.rnggagib.managers.RewardManager;
 import id.rnggagib.managers.PlayerDataManager;
-import id.rnggagib.managers.WorldGuardManager;
-import id.rnggagib.managers.BlockRegenerationManager;
+import id.rnggagib.managers.RegionManager;
+import id.rnggagib.managers.RewardManager;
 import id.rnggagib.placeholder.PlaceholderManager;
+import id.rnggagib.utils.SelectionWand;
 
 import java.util.logging.Logger;
 import org.bukkit.plugin.PluginManager;
@@ -34,8 +38,10 @@ public class BlockParty extends JavaPlugin {
     private MiningSessionManager sessionManager;
     private RewardManager rewardManager;
     private PlayerDataManager playerDataManager;
-    private WorldGuardManager worldGuardManager;
+    private RegionManager regionManager;
     private BlockRegenerationManager blockRegenerationManager;
+    private ComboManager comboManager;
+    private SelectionWand selectionWand;
     private PlaceholderManager placeholderManager;
     
     // Command handler
@@ -53,11 +59,13 @@ public class BlockParty extends JavaPlugin {
         // Initialize managers
         messageManager = new MessageManager(this);
         playerDataManager = new PlayerDataManager(this);
-        worldGuardManager = new WorldGuardManager(this);
+        regionManager = new RegionManager(this);
+        selectionWand = new SelectionWand(this);
         accessManager = new AccessManager(this);
         sessionManager = new MiningSessionManager(this);
         rewardManager = new RewardManager(this);
         blockRegenerationManager = new BlockRegenerationManager(this);
+        comboManager = new ComboManager(this);
         
         // Register events
         registerListeners();
@@ -85,11 +93,17 @@ public class BlockParty extends JavaPlugin {
             playerDataManager.saveAllPlayerData();
         }
         
+        // Save regions
+        regionManager.saveRegions();
+        
         // Cancel any active sessions
         sessionManager.cancelAllSessions();
         
         // Cancel block regeneration tasks
         blockRegenerationManager.cancelAllTasks();
+        
+        // Cancel combo manager tasks
+        comboManager.cancelAllTasks();
         
         LOGGER.info("BlockParty has been disabled!");
     }
@@ -103,6 +117,10 @@ public class BlockParty extends JavaPlugin {
         pm.registerEvents(new BlockBreakListener(this), this);
         pm.registerEvents(new PlayerJoinListener(this), this);
         pm.registerEvents(new PlayerQuitListener(this), this);
+        pm.registerEvents(new RegionWandListener(this), this);
+        
+        // Register the new item protection listener
+        pm.registerEvents(new ItemProtectionListener(this), this);
     }
     
     /**
@@ -138,16 +156,20 @@ public class BlockParty extends JavaPlugin {
         return playerDataManager;
     }
     
-    public WorldGuardManager getWorldGuardManager() {
-        return worldGuardManager;
+    public RegionManager getRegionManager() {
+        return regionManager;
     }
     
-    /**
-     * Get the block regeneration manager
-     * @return BlockRegenerationManager instance
-     */
+    public SelectionWand getSelectionWand() {
+        return selectionWand;
+    }
+    
     public BlockRegenerationManager getBlockRegenerationManager() {
         return blockRegenerationManager;
+    }
+    
+    public ComboManager getComboManager() {
+        return comboManager;
     }
     
     /**
@@ -160,9 +182,13 @@ public class BlockParty extends JavaPlugin {
         // Reload configurations
         configManager.reloadConfigs();
         
+        // Reload regions
+        regionManager.loadRegions();
+        
         // Reinitialize managers that need reloading
         rewardManager.reload();
         accessManager.reload();
         blockRegenerationManager.reload();
+        comboManager.reload();
     }
 }

@@ -18,13 +18,15 @@ messages:
     already-active: "<yellow>You already have an active Block Party session.</yellow>"
     received: "<green>You received <gold>%amount%x</gold> Block Party access item(s)!</green>"
     given: "<green>Gave <gold>%amount%x</gold> Block Party access to <yellow>%player%</yellow>.</green>"
+    cannot-drop: "<red>This BlockParty pickaxe cannot be dropped!</red>"
+    cannot-transfer: "<red>BlockParty pickaxes cannot be moved to other containers!</red>"
   
   # Timer messages
   timer:
     started: "<green>Block Party started! <gold>5:00</gold> remaining.</green>"
     action-bar: "<gray>Mining Time: <gold>{time}</gold></gray>"
-    action-bar-enhanced: "<bold><yellow>⏰ Mining Time: <gold>{time} </gold>⏰</yellow></bold>"
-    warning: "<yellow>Block Party ending in <gold>%time%</gold>!</yellow>"
+    action-bar-enhanced: "<bold><yellow>⏰ MINING TIME: <gold>{time}</gold> ⏰</yellow></bold>"
+    warning: "<yellow>Block Party ending in <gold>{time}</gold>!</yellow>"
     ended: "<red>Your Block Party mining session has ended.</red>"
     ended-item-removed: "<red>Your Block Party mining session has ended and your access item has been consumed.</red>"
   
@@ -35,6 +37,15 @@ messages:
     block-regenerate: "<gray>The block will regenerate soon...</gray>"
     inactive-pickaxe: "<red>You need to activate this pickaxe first by right-clicking with it.</red>"
     must-use-pickaxe: "<red>You must use your Block Party pickaxe to mine these special blocks.</red>"
+    outside-region: "<red>You can only mine special blocks within designated Block Party regions.</red>"
+    protected-region: "<red>This block can only be mined with an active BlockParty pickaxe.</red>"
+  
+  # Combo messages
+  combo:
+    increment: "<gray>Combo: <yellow>{combo}</yellow></gray>"
+    milestone: "<gold>⚡ Combo x{combo}! <yellow>Reward chance: {multiplier}</yellow> ⚡</gold>"
+    warning: "<yellow>Combo ending in {time}s!</yellow>"
+    expired: "<red>Your x{combo} combo has expired!</red>"
   
   # Command messages
   command:

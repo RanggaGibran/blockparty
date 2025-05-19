@@ -186,37 +186,41 @@ public class RewardManager {
      * @return True if a reward was given
      */
     public boolean giveRandomReward(Player player) {
-        // Calculate chance for each reward type based on their relative weights
-        double totalChance = 0;
-        if (mmoItemsEnabled) totalChance += mmoItemsChance;
-        if (crateKeysEnabled) totalChance += crateKeysChance;
-        if (vanillaItemsEnabled) totalChance += vanillaItemsChance;
+        return giveRandomReward(player, 1.0);
+    }
+    
+    /**
+     * Give a random reward with combo multiplier
+     * @param player The player to give the reward to
+     * @param multiplier Combo multiplier to adjust reward chances
+     * @return True if a reward was given
+     */
+    public boolean giveRandomReward(Player player, double multiplier) {
+        // Adjust chance based on combo multiplier
+        double adjustedChance = random.nextDouble() * multiplier;
         
-        if (totalChance <= 0) {
-            return false;
+        // Try MMOItems rewards first if enabled
+        if (mmoItemsEnabled && adjustedChance <= mmoItemsChance * multiplier && isMMOItemsAvailable()) {
+            if (giveMmoItemReward(player)) {
+                return true;
+            }
         }
         
-        double roll = random.nextDouble() * totalChance;
-        double currentChance = 0;
-        
-        // Increment player stats
-        plugin.getPlayerDataManager().getPlayerData(player).incrementRewardsFound();
-        
-        // Give MMOItems reward
-        if (mmoItemsEnabled && roll < (currentChance += mmoItemsChance)) {
-            return giveMmoItemReward(player);
+        // Try crate key rewards if enabled
+        if (crateKeysEnabled && adjustedChance <= crateKeysChance * multiplier) {
+            if (giveCrateKeyReward(player)) {
+                return true;
+            }
         }
         
-        // Give crate key reward
-        if (crateKeysEnabled && roll < (currentChance += crateKeysChance)) {
-            return giveCrateKeyReward(player);
+        // Try vanilla item rewards if enabled
+        if (vanillaItemsEnabled && adjustedChance <= vanillaItemsChance * multiplier) {
+            if (giveVanillaItemReward(player)) {
+                return true;
+            }
         }
         
-        // Give vanilla item reward
-        if (vanillaItemsEnabled) {
-            return giveVanillaItemReward(player);
-        }
-        
+        // No reward was given
         return false;
     }
     

@@ -1,7 +1,8 @@
 package id.rnggagib.listeners;
 
 import id.rnggagib.BlockParty;
-import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,9 +10,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Handles player interactions with BlockParty access items
@@ -32,28 +30,28 @@ public class PlayerInteractListener implements Listener {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Skip if not a right-click action
+        // Only handle main hand interactions
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        
+        // Only handle right-click actions
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
         
-        // Skip if off-hand (to prevent double activations)
-        if (event.getHand() == EquipmentSlot.OFF_HAND) {
-            return;
-        }
-        
-        Player player = event.getPlayer();
+        // Check if player is holding our access item
         ItemStack item = event.getItem();
-        
-        // Check if the item is a BlockParty access item
         if (item == null || !plugin.getAccessManager().isAccessItem(item)) {
             return;
         }
         
-        // Cancel the event to prevent normal interactions
+        // Cancel the event to prevent normal item use
         event.setCancelled(true);
         
-        // Check if player has permission
+        Player player = event.getPlayer();
+        
+        // Check for permission
         if (!player.hasPermission("blockparty.use")) {
             plugin.getMessageManager().sendMessage(player, "plugin.no-permission");
             return;
@@ -65,8 +63,12 @@ public class PlayerInteractListener implements Listener {
             return;
         }
         
-        // Check WorldGuard regions if enabled
-        if (!plugin.getWorldGuardManager().canUseBlockParty(player, player.getLocation())) {
+        // Check if player is in a BlockParty region
+        boolean hasRegions = !plugin.getRegionManager().getRegionNames().isEmpty();
+        boolean inRegion = plugin.getRegionManager().isInRegion(player.getLocation());
+        
+        // Only allow access in regions, if regions are defined
+        if (hasRegions && !inRegion) {
             plugin.getMessageManager().sendMessage(player, "access.denied");
             return;
         }
@@ -78,10 +80,10 @@ public class PlayerInteractListener implements Listener {
             // Send access granted message
             plugin.getMessageManager().sendMessage(player, "access.granted");
             
-            // Consume one item if not in creative mode
-            if (!player.getGameMode().toString().equals("CREATIVE")) {
-                item.setAmount(item.getAmount() - 1);
-            }
+            // DON'T consume the access item here - the session will handle item removal when it expires
+            // Instead, play a sound and effect to indicate successful activation
+            player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.0f);
+            player.spawnParticle(Particle.HAPPY_VILLAGER, player.getLocation().add(0, 1, 0), 15, 0.5, 0.5, 0.5, 0.1);
         }
     }
 }

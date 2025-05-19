@@ -88,7 +88,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
                 if (onlinePlayer == null) {
                     return "no";
                 }
-                return plugin.getWorldGuardManager().canUseBlockParty(onlinePlayer, onlinePlayer.getLocation()) ? "yes" : "no";
+                //return plugin.getWorldGuardManager().canUseBlockParty(onlinePlayer, onlinePlayer.getLocation()) ? "yes" : "no";
         }
         
         return null; // Placeholder not found

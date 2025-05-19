@@ -39,3 +39,20 @@ statistics:
   enabled: true
   # Save statistics to file on plugin disable
   save-on-disable: true
+
+# Combo System Settings
+combo:
+  # Enable combo system
+  enabled: true
+  # Time before combo expires (seconds)
+  expiry-time: 5
+  # Time before warning (seconds)
+  warning-time: 3
+  # Base multiplier increment for each combo
+  base-multiplier: 0.1
+  # Number of combos needed for level up message
+  level-threshold: 5
+  # Play sounds on combo milestone
+  use-sound: true
+  # Show particles on combo milestone
+  use-particles: true

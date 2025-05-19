@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,8 @@ public class MessageManager {
     private final MiniMessage miniMessage;
     private final BukkitAudiences adventure;
     private String prefix;
+    private Map<UUID, Long> lastRegenerationMessage = new HashMap<>();
+    private static final int REGENERATION_MESSAGE_COOLDOWN = 3; // seconds
     
     /**
      * Constructor
@@ -63,19 +66,30 @@ public class MessageManager {
     }
     
     /**
-     * Replace placeholders in a message
-     * @param message The message
-     * @param placeholders A map of placeholder keys and values
-     * @return The message with placeholders replaced
+     * Replace placeholders in messages
+     * @param message The message to replace placeholders in
+     * @param placeholders Map of placeholders and their values
+     * @return The message with replaced placeholders
      */
-    public String replacePlaceholders(String message, Map<String, String> placeholders) {
-        if (placeholders == null || placeholders.isEmpty() || message == null) {
-            return message;
+    private String replacePlaceholders(String message, Map<String, String> placeholders) {
+        if (message == null) {
+            return "";
         }
         
         String result = message;
-        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            result = result.replace("%" + entry.getKey() + "%", entry.getValue());
+        
+        if (placeholders != null) {
+            // Replace both {placeholder} and %placeholder% formats for compatibility
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                
+                // Replace {placeholder} format
+                result = result.replace("{" + key + "}", value);
+                
+                // Replace %placeholder% format for backward compatibility
+                result = result.replace("%" + key + "%", value);
+            }
         }
         
         return result;
@@ -224,5 +238,22 @@ public class MessageManager {
         Pattern pattern = Pattern.compile("<[^>]*>");
         Matcher matcher = pattern.matcher(input);
         return matcher.replaceAll("");
+    }
+    
+    /**
+     * Send a block regeneration message to a player with cooldown
+     * @param player The player
+     */
+    public void sendRegenerationMessage(Player player) {
+        UUID uuid = player.getUniqueId();
+        long currentTime = System.currentTimeMillis() / 1000;
+        
+        // Check if we should send the message based on cooldown
+        if (!lastRegenerationMessage.containsKey(uuid) || 
+                (currentTime - lastRegenerationMessage.get(uuid) >= REGENERATION_MESSAGE_COOLDOWN)) {
+            // Send the message and update the timestamp
+            sendMessage(player, "mining.block-regenerate");
+            lastRegenerationMessage.put(uuid, currentTime);
+        }
     }
 }

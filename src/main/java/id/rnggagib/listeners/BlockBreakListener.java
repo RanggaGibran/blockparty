@@ -1,7 +1,6 @@
 package id.rnggagib.listeners;
 
 import id.rnggagib.BlockParty;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -40,56 +39,88 @@ public class BlockBreakListener implements Listener {
         Material material = block.getType();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         
-        // Check if the player is using a BlockParty access item for normal mining
-        if (plugin.getAccessManager().isAccessItem(itemInHand) && 
-                !plugin.getSessionManager().hasActiveSession(player.getUniqueId())) {
-            // Cancel the event - can't use BlockParty pickaxe for normal mining
+        boolean isBlockPartyPickaxe = plugin.getAccessManager().isAccessItem(itemInHand);
+        boolean hasActiveSession = plugin.getSessionManager().hasActiveSession(player.getUniqueId());
+        boolean isBlockPartyBlock = plugin.getRewardManager().isMinableBlock(material);
+        boolean hasRegions = !plugin.getRegionManager().getRegionNames().isEmpty();
+        boolean inBlockPartyRegion = plugin.getRegionManager().isInRegion(block.getLocation());
+        
+        // ===== FIRST: HANDLE OUTSIDE REGION MINING =====
+        // If we have regions defined and player is outside them,
+        // allow normal mining with regular tools immediately
+        if (hasRegions && !inBlockPartyRegion) {
+            // Only restrict using BlockParty pickaxes outside regions
+            if (isBlockPartyPickaxe) {
+                event.setCancelled(true);
+                plugin.getMessageManager().sendMessage(player, "mining.outside-region");
+            }
+            // Allow normal mining outside regions with ANY other tool
+            return;
+        }
+        
+        // ===== SECOND: HANDLE INACTIVE BLOCKPARTY PICKAXES =====
+        // Don't allow using BlockParty pickaxes without an active session
+        if (isBlockPartyPickaxe && !hasActiveSession) {
             event.setCancelled(true);
             plugin.getMessageManager().sendMessage(player, "mining.inactive-pickaxe");
             return;
         }
         
-        // Check if this is a minable block in the config
-        if (!plugin.getRewardManager().isMinableBlock(material)) {
-            return; // Not a configured block, ignore
+        // ===== THIRD: HANDLE MINING INSIDE REGIONS =====
+        if (hasRegions && inBlockPartyRegion) {
+            // Only apply special rules to BlockParty blocks
+            if (isBlockPartyBlock) {
+                // Must use BlockParty pickaxe with active session for BlockParty blocks
+                if (!isBlockPartyPickaxe || !hasActiveSession) {
+                    event.setCancelled(true);
+                    plugin.getMessageManager().sendMessage(player, "mining.protected-region");
+                    return;
+                }
+                // Will continue to BlockParty mining logic below
+            } else {
+                // Not a BlockParty block, allow normal mining
+                return;
+            }
+        }
+        // ===== FOURTH: NO REGIONS CONFIGURED =====
+        else if (!hasRegions) {
+            // If no regions are configured, enforce BlockParty pickaxe for BlockParty blocks
+            if (isBlockPartyBlock && !isBlockPartyPickaxe) {
+                event.setCancelled(true);
+                plugin.getMessageManager().sendMessage(player, "mining.must-use-pickaxe");
+                return;
+            }
         }
         
-        // Check if player has an active session
-        if (!plugin.getSessionManager().hasActiveSession(player.getUniqueId())) {
-            // Only cancel if they're trying to mine a BlockParty block
-            event.setCancelled(true);
-            plugin.getMessageManager().sendMessage(player, "mining.no-active-session");
-            return;
+        // ===== FINALLY: HANDLE BLOCKPARTY MINING =====
+        // Only reach here if:
+        // 1. Player is in a BlockParty region or no regions configured
+        // 2. Player is using BlockParty pickaxe with active session
+        // 3. Block is a BlockParty block
+        if (isBlockPartyPickaxe && hasActiveSession && isBlockPartyBlock) {
+            // Continue with BlockParty mining logic
+            BlockState blockState = block.getState();
+            
+            // Check if should drop vanilla items
+            if (!plugin.getRewardManager().shouldDropVanilla(material)) {
+                event.setDropItems(false);
+            }
+            
+            // Update player statistics
+            plugin.getPlayerDataManager().getPlayerData(player).incrementBlocksMined();
+            
+            // Increment combo for the player
+            int combo = plugin.getComboManager().incrementCombo(player);
+            double multiplier = plugin.getComboManager().getPlayerComboMultiplier(player.getUniqueId());
+            
+            // Check if should give reward (with combo multiplier)
+            if (plugin.getRewardManager().shouldGiveReward(material)) {
+                // Pass the combo multiplier to adjust reward chances
+                plugin.getRewardManager().giveRandomReward(player, multiplier);
+            }
+            
+            // Schedule block regeneration using the manager
+            plugin.getBlockRegenerationManager().scheduleRegeneration(block, blockState);
         }
-        
-        // Check if player is using the BlockParty access item
-        if (!plugin.getAccessManager().isAccessItem(itemInHand)) {
-            // Cancel the event - must use BlockParty pickaxe for mining during session
-            event.setCancelled(true);
-            plugin.getMessageManager().sendMessage(player, "mining.must-use-pickaxe");
-            return;
-        }
-        
-        // Store the block state for regeneration
-        BlockState blockState = block.getState();
-        
-        // Check if should drop vanilla items
-        if (!plugin.getRewardManager().shouldDropVanilla(material)) {
-            event.setDropItems(false);
-        }
-        
-        // Update player statistics
-        plugin.getPlayerDataManager().getPlayerData(player).incrementBlocksMined();
-        
-        // Check if should give reward
-        if (plugin.getRewardManager().shouldGiveReward(material)) {
-            plugin.getRewardManager().giveRandomReward(player);
-        }
-        
-        // Schedule block regeneration using the manager
-        plugin.getBlockRegenerationManager().scheduleRegeneration(block, blockState);
-        
-        // Inform player about block regeneration
-        plugin.getMessageManager().sendMessage(player, "mining.block-regenerate");
     }
 }
