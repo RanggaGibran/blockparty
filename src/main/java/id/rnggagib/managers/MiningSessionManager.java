@@ -2,7 +2,9 @@ package id.rnggagib.managers;
 
 import id.rnggagib.BlockParty;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -72,7 +74,7 @@ public class MiningSessionManager {
         BukkitTask sessionEndTask = new BukkitRunnable() {
             @Override
             public void run() {
-                endSession(uuid);
+                endSession(uuid, true); // true indicates the session expired naturally
             }
         }.runTaskLater(plugin, sessionDuration * 20L); // Convert seconds to ticks
         
@@ -157,13 +159,19 @@ public class MiningSessionManager {
                 // Format time as minutes:seconds
                 String formattedTime = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60);
                 
-                // Send action bar
+                // Send action bar with enhanced formatting
                 Map<String, String> placeholders = new HashMap<>();
                 placeholders.put("time", formattedTime);
                 
                 Player onlinePlayer = Bukkit.getPlayer(uuid);
                 if (onlinePlayer != null && onlinePlayer.isOnline()) {
-                    plugin.getMessageManager().sendActionBar(onlinePlayer, "timer.action-bar", placeholders);
+                    // Use more prominent formatting for the action bar timer
+                    plugin.getMessageManager().sendActionBar(onlinePlayer, "timer.action-bar-enhanced", placeholders);
+                    
+                    // If time is running low (less than 30 seconds), play sound notification
+                    if (timeRemaining <= 30 && timeRemaining % 5 == 0) {
+                        onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                    }
                 }
             }
         }.runTaskTimer(plugin, 0, timerUpdateFrequency);
@@ -174,8 +182,9 @@ public class MiningSessionManager {
     /**
      * End a mining session
      * @param uuid The player's UUID
+     * @param expired True if the session ended because time expired, false otherwise
      */
-    public void endSession(UUID uuid) {
+    public void endSession(UUID uuid, boolean expired) {
         if (!activeSessions.containsKey(uuid)) {
             return;
         }
@@ -197,7 +206,33 @@ public class MiningSessionManager {
         // Send end message if player is online
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
-            plugin.getMessageManager().sendMessage(player, "timer.ended");
+            // If the session expired naturally, remove the access item
+            if (expired) {
+                removeAccessItem(player);
+                plugin.getMessageManager().sendMessage(player, "timer.ended-item-removed");
+            } else {
+                plugin.getMessageManager().sendMessage(player, "timer.ended");
+            }
+        }
+    }
+    
+    /**
+     * Remove the access item from a player's inventory
+     * @param player The player
+     */
+    private void removeAccessItem(Player player) {
+        // Check inventory for access items and remove one
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && plugin.getAccessManager().isAccessItem(item)) {
+                // If only one item, set to null
+                if (item.getAmount() == 1) {
+                    player.getInventory().removeItem(item);
+                } else {
+                    // If multiple items, reduce by 1
+                    item.setAmount(item.getAmount() - 1);
+                }
+                break; // Just remove one
+            }
         }
     }
     
@@ -217,7 +252,7 @@ public class MiningSessionManager {
         
         if (currentTime >= endTime) {
             // Session has expired, clean it up
-            endSession(uuid);
+            endSession(uuid, true);
             return false;
         }
         
@@ -245,7 +280,7 @@ public class MiningSessionManager {
      */
     public void cancelAllSessions() {
         for (UUID uuid : activeSessions.keySet()) {
-            endSession(uuid);
+            endSession(uuid, false); // false because this is manually canceled, not expired
         }
         
         // Clear all collections just to be safe

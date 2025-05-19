@@ -107,20 +107,20 @@ public class WorldGuardManager {
             }
         }
         
-        // If allowed regions list is empty, allow in any non-denied region
-        if (allowedRegions.isEmpty()) {
-            return true;
-        }
-        
         // Check if player is in any allowed region
-        for (String region : regions) {
-            if (allowedRegions.contains(region)) {
-                return true;
+        // If there are allowed regions defined, player must be in one of them
+        if (!allowedRegions.isEmpty()) {
+            for (String region : regions) {
+                if (allowedRegions.contains(region)) {
+                    return true;
+                }
             }
+            // If we have an allowed regions list but player isn't in any, deny
+            return false;
         }
         
-        // If we have an allowed regions list but player isn't in any, deny
-        return false;
+        // If no allowed regions have been defined yet, allow mining anywhere
+        return true;
     }
     
     /**

@@ -22,15 +22,19 @@ messages:
   # Timer messages
   timer:
     started: "<green>Block Party started! <gold>5:00</gold> remaining.</green>"
-    action-bar: "<gold>Block Party: %time% remaining</gold>"
+    action-bar: "<gray>Mining Time: <gold>{time}</gold></gray>"
+    action-bar-enhanced: "<bold><yellow>⏰ Mining Time: <gold>{time} </gold>⏰</yellow></bold>"
     warning: "<yellow>Block Party ending in <gold>%time%</gold>!</yellow>"
-    ended: "<red>Your Block Party session has ended.</red>"
+    ended: "<red>Your Block Party mining session has ended.</red>"
+    ended-item-removed: "<red>Your Block Party mining session has ended and your access item has been consumed.</red>"
   
   # Mining messages
   mining:
     cannot-break: "<red>You can't mine this block during Block Party.</red>"
     no-active-session: "<red>You need an active Block Party session to mine special blocks.</red>"
     block-regenerate: "<gray>The block will regenerate soon...</gray>"
+    inactive-pickaxe: "<red>You need to activate this pickaxe first by right-clicking with it.</red>"
+    must-use-pickaxe: "<red>You must use your Block Party pickaxe to mine these special blocks.</red>"
   
   # Command messages
   command:
@@ -62,4 +66,4 @@ messages:
     removed: "<green>Region <gold>{region}</gold> has been removed from allowed mining areas.</green>"
     not-found: "<red>Region <gold>{region}</gold> was not found in allowed mining areas.</red>"
     list-header: "<yellow>Allowed Mining Regions:</yellow>"
-    no-regions: "<yellow>No regions have been set up for mining. By default, mining is allowed everywhere.</yellow>"
+    no-regions: "<yellow>No regions have been set up for mining. By default, mining is allowed everywhere. Once you add a region, mining will be restricted to only those regions.</yellow>"

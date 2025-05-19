@@ -30,7 +30,7 @@ public class PlayerQuitListener implements Listener {
         
         // End any active mining session
         if (plugin.getSessionManager().hasActiveSession(player.getUniqueId())) {
-            plugin.getSessionManager().endSession(player.getUniqueId());
+            plugin.getSessionManager().endSession(player.getUniqueId(), false);
         }
         
         // Save and unload player data

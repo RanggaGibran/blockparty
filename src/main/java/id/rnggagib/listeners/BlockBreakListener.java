@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Handles block breaking for BlockParty sessions
@@ -37,6 +38,16 @@ public class BlockBreakListener implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
         Material material = block.getType();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        
+        // Check if the player is using a BlockParty access item for normal mining
+        if (plugin.getAccessManager().isAccessItem(itemInHand) && 
+                !plugin.getSessionManager().hasActiveSession(player.getUniqueId())) {
+            // Cancel the event - can't use BlockParty pickaxe for normal mining
+            event.setCancelled(true);
+            plugin.getMessageManager().sendMessage(player, "mining.inactive-pickaxe");
+            return;
+        }
         
         // Check if this is a minable block in the config
         if (!plugin.getRewardManager().isMinableBlock(material)) {
@@ -48,6 +59,14 @@ public class BlockBreakListener implements Listener {
             // Only cancel if they're trying to mine a BlockParty block
             event.setCancelled(true);
             plugin.getMessageManager().sendMessage(player, "mining.no-active-session");
+            return;
+        }
+        
+        // Check if player is using the BlockParty access item
+        if (!plugin.getAccessManager().isAccessItem(itemInHand)) {
+            // Cancel the event - must use BlockParty pickaxe for mining during session
+            event.setCancelled(true);
+            plugin.getMessageManager().sendMessage(player, "mining.must-use-pickaxe");
             return;
         }
         
